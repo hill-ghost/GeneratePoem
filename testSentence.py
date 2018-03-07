@@ -5,6 +5,7 @@ import tensorflow as tf
 import pickle
 import os
 import re
+from topic import *
 
 PATH5 =r'C:\Users\Pan\Desktop\poem\data\jueju5_utf8'
 PATH7 =r'C:\Users\Pan\Desktop\poem\data\jueju7_utf8'
@@ -21,7 +22,7 @@ def read_poems(path):
                     line = line.strip(u'\n')
                     temp = re.split('[，。？！]',line)[:-1]
                     for sen in temp:
-                        poems.append(sen)
+                        poems.append('['+sen+']')
                 except Exception as e:
                     pass     
     return poems
@@ -40,6 +41,13 @@ def read_word2id_map():
         word2id_map = pickle.load(f)
     return word2id_map
 
+def getKeyword():
+    category, topics, keywords = getCategory_Topics_Keywords()
+    return random_keywords(keywords[0][0])#这里是模拟，后期要更改
+
+def getFirstSentence():
+    return gen_firstSentence()
+
 poems = read_poems(PATH5)
 print('共有%s个句子 ' % len(poems))
 
@@ -52,7 +60,7 @@ to_num = lambda word: word2id_map.get(word, len(words))
 poems_vector = [list(map(to_num, poem)) for poem in poems]
 
 
-# 每次取64首诗进行训练
+# 每次取1首诗进行训练
 batch_size = 1
 # 1次epoch需要训练n_chunk次
 n_chunk = len(poems_vector) // batch_size
@@ -96,10 +104,11 @@ class DataSet(object):
         ydata[:,:-1] = xdata[:, 1:]
         return xdata,ydata
 
-#---------------------------------------RNN--------------------------------------#
-#输入占位符
+# RNN
+
+# 输入占位符
 input_data = tf.placeholder(tf.int32, [batch_size, None])
-#输出占位符
+# 输出占位符
 output_targets = tf.placeholder(tf.int32, [batch_size, None])
 # 定义RNN
 def neural_network(model='lstm', rnn_size=128, num_layers=2):
@@ -131,13 +140,15 @@ def neural_network(model='lstm', rnn_size=128, num_layers=2):
     probs = tf.nn.softmax(logits)
     return logits, last_state, probs, cell, initial_state
 
-#-------------------------------生成古诗---------------------------------#
+# 生成古诗
+
 # 使用训练完成的模型
-def gen_poetry():
+def gen_firstSentence():
     def to_word(weights):
-        t = np.cumsum(weights)
-        s = np.sum(weights)
-        sample = int(np.searchsorted(t, np.random.rand(1)*s))#二分查找法找出随机数在t中的位置
+        t = np.cumsum(weights)#当前元素是前面所有元素的累加
+        s = np.sum(weights)#累加所有元素
+        m = np.random.rand(1)*s
+        sample = int(np.searchsorted(t, m))#二分查找法找出随机数在t中的位置
         return words[sample]
 
     _, last_state, probs, cell, initial_state = neural_network()
@@ -149,7 +160,8 @@ def gen_poetry():
     with tf.Session(config = Session_config) as sess:
         sess.run(tf.global_variables_initializer())
         #创建saver
-        saver = tf.train.Saver(tf.global_variables())
+        list = [softmax_w,softmax_b]
+        saver = tf.train.Saver(list)
         #saver.restore(sess, 'model/poetry.module-99')
         #从checkpoints文件中恢复变量
         ckpt = tf.train.get_checkpoint_state('./sentence_model/')
@@ -170,15 +182,21 @@ def gen_poetry():
         [probs_, state_] = sess.run([probs, last_state], feed_dict={input_data: x, initial_state: state_})
         word = to_word(probs_)
         #word = words[np.argmax(probs_)]
-        poem = ''
+        poem = getKeyword()
+        for word in poem:
+            x = np.zeros((1,1))#生成一行一列零矩阵
+            x[0,0] = word2id_map.get(word,len(words)-1)
+            [probs_, state_] = sess.run([probs, last_state], feed_dict={input_data: x, initial_state: state_})
+            word = to_word(probs_)
+
         while word != ']':
             poem += word
             x = np.zeros((1,1))#生成一行一列零矩阵
-            x[0,0] = word2id_map[word]
+            x[0,0] = word2id_map.get(word,len(words)-1)
             [probs_, state_] = sess.run([probs, last_state], feed_dict={input_data: x, initial_state: state_})
-            word = to_word(probs_)
-            #word = words[np.argmax(probs_)]
+            word = words[np.argmax(probs_)]
         return poem
 
-print(gen_poetry())
+if __name__ == '__main__':
+    print(gen_firstSentence())
 

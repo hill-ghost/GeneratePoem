@@ -1,3 +1,4 @@
+#-*- coding: UTF-8 -*-
 import tensorflow as tf
 import pickle
 import numpy as np
@@ -20,7 +21,16 @@ def id2word(ids):
         sentence.append(words[one])
     return sentence
 
-with tf.device('/cpu:0'):
+def str2list(sentence):
+    list = []
+    for word in sentence:
+        list.append(word)
+    list.append("_")
+    list.append("_")
+    print(list)
+    return list
+
+def genNextSentence(sentence):
     batch_size = 1
     sequence_length = 7
     num_encoder_symbols = 2943
@@ -54,7 +64,7 @@ with tf.device('/cpu:0'):
     with tf.Session() as sess:
         module_file = tf.train.latest_checkpoint('./poem_model/')
         saver.restore(sess, module_file)
-        encoder_input = word2id(['日','落','青','霞','起','_','_'])
+        encoder_input = word2id(str2list(sentence))
 
         encoder_input = np.asarray([np.asarray(encoder_input)])
         decoder_input = np.zeros([1, sequence_length])
@@ -64,4 +74,4 @@ with tf.device('/cpu:0'):
         print(pred_value)
         sentence = id2word(pred_value[0])
         print(sentence)
-
+    return sentence

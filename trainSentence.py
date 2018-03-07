@@ -157,7 +157,7 @@ def train_neural_network():
         saver = tf.train.Saver(tf.global_variables())
         last_epoch = load_model(sess, saver, 'sentence_model/')
 
-        for epoch in range(last_epoch + 1, 101):
+        for epoch in range(last_epoch + 1, 1501):
             sess.run(tf.assign(learning_rate, 0.002 * (0.97 ** epoch)))
             #sess.run(tf.assign(learning_rate, 0.01))
 
