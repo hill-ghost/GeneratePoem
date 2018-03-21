@@ -8,6 +8,15 @@ import re
 
 PATH5 =r'C:\Users\Pan\Desktop\poem\data\jueju5_utf8'
 PATH7 =r'C:\Users\Pan\Desktop\poem\data\jueju7_utf8'
+SAVE_PATH5 =r'sentence_model/poem5/'
+SAVE_PATH7 =r'sentence_model/poem7/'
+SAVE_FILE_PATH5 =r'sentence_model/poem5/poetry.module'
+SAVE_FILE_PATH7 =r'sentence_model/poem7/poetry.module'
+
+#训练不同字数的诗句时改变以下变量的索引
+PATH = PATH7
+SAVE_PATH = SAVE_PATH7
+SAVE_FILE_PATH = SAVE_FILE_PATH7
 
 #将所有诗切分成句子
 def read_poems(path):
@@ -40,7 +49,7 @@ def read_word2id_map():
         word2id_map = pickle.load(f)
     return word2id_map
 
-poems = read_poems(PATH5)
+poems = read_poems(PATH)
 print('共有%s个句子 ' % len(poems))
 
 
@@ -155,7 +164,7 @@ def train_neural_network():
         sess.run(tf.global_variables_initializer())
 
         saver = tf.train.Saver(tf.global_variables())
-        last_epoch = load_model(sess, saver, 'sentence_model/')
+        last_epoch = load_model(sess, saver, SAVE_PATH)
 
         for epoch in range(last_epoch + 1, 1501):
             sess.run(tf.assign(learning_rate, 0.002 * (0.97 ** epoch)))
@@ -171,7 +180,8 @@ def train_neural_network():
                 if batche % 50 == 1:
                     print(epoch, batche, 0.002 * (0.97 ** epoch),train_loss)
             if epoch % 20 == 0:
-                saver.save(sess, 'sentence_model/poetry.module', global_step = epoch)
-            print (epoch,' Loss: ', all_loss * 1.0 / n_chunk)
+                saver.save(sess, SAVE_FILE_PATH, global_step = epoch)
+            print(epoch,' Loss: ', all_loss * 1.0 / n_chunk)
 
-train_neural_network()
+if __name__ == '__main__':
+    train_neural_network()

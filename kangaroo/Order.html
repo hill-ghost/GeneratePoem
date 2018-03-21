@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset="utf-8">
+<meta name="format-detection" content="telephone=no"> <!-- 禁止数字自动转为拨号链接 -->
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="stylesheet" type="text/css" href="css/Order.css">
+<title>订单详情</title>
+</head>
+<body>
+<div id="Order_info">
+<div id="Order_top">
+	<img src="img/order-banner.png">
+	<div id="goods_title">
+	<p class="goods_name">娃娃</p>
+	<p class="goods_value"><span>￥</span><span>5.0</span></p>
+</div>
+</div>
+<table>
+<tr>
+	<td style="width: 6.5rem;">发布者</td>
+	<td>梁永辉</td>
+</tr>
+<tr>
+	<td>订单编号</td>
+	<td>1008631415926</td>
+</tr>
+<tr>
+	<td>订单状况</td>
+	<td>等待接单</td>
+</tr>
+<tr>
+	<td>起始地址</td>
+	<td>广外</td>
+</tr>
+<tr>
+	<td>目的地址</td>
+	<td>大学城北</td>
+</tr>
+
+<tr>
+	<td>交货期限</td>
+	<td>2018-3-15 17:00</td>
+</tr>
+<tr>
+	<td>物品重量</td>
+	<td>20.0kg</td>
+</tr>
+<tr>
+	<td valign="top">订单备注</td>
+	<td style="max-width: 12rem;" >易碎物品注意轻放易碎物品注意轻放易碎物品注意轻放易碎物品注意轻放易碎物品注意轻放易碎物品注意轻放易碎物品注意轻放易碎物品注意轻放</td>
+</tr>
+</table>
+</div>
+<div id="footer_btn">
+<button id="last_btn" class="page_btn"><p>&lt;</p><p>上一单</p></button>
+<button id="next_btn" class="page_btn"><p>&gt;</p><p>下一单</p></button>
+<button id="take_btn">去接单</button>
+</div>
+</body>
+</html>
+<script type="text/javascript">
+var foot_height = document.getElementById('footer_btn').offsetHeight;
+var wheight = document.body.clientHeight;
+document.getElementById('Order_info').style.height = wheight - foot_height + 'px';
+</script>

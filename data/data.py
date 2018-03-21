@@ -6,8 +6,8 @@ import pickle
 import os
 import re
 
-path1 =r'C:\Users\Pan\Desktop\poem\data\jueju5_utf8'
-path2 =r'C:\Users\Pan\Desktop\poem\data\jueju7_utf8'
+PATH5 =r'C:\Users\Pan\Desktop\poem\data\jueju5_utf8'
+PATH7 =r'C:\Users\Pan\Desktop\poem\data\jueju7_utf8'
 
 #获得序对
 def read_poems(path):
@@ -34,12 +34,14 @@ def read_poems(path):
         last_sen.append(sum_sen[0]+'_'+'_')
         next_sen.append('['+sum_sen[1]+']')
         target_sen.append(sum_sen[1]+']'+'_')
+
         last_sen.append(sum_sen[1]+'_'+'_')
         next_sen.append('['+sum_sen[2]+']')
-        target_sen.append(sum_sen[1]+']'+'_')
+        target_sen.append(sum_sen[2]+']'+'_')
+
         last_sen.append(sum_sen[2]+'_'+'_')
         next_sen.append('['+sum_sen[3]+']')
-        target_sen.append(sum_sen[1]+']'+'_')
+        target_sen.append(sum_sen[3]+']'+'_')
         
     return poems,last_sen,next_sen,target_sen
 
@@ -68,27 +70,51 @@ def word2id(sentences,words,word2id_map):
     return poems_id  
     
 def preprocess_data():
-    poems,last_sen,next_sen,target_sen = read_poems(path1)
+    poems5,last_sen5,next_sen5,target_sen5 = read_poems(PATH5)
+    poems7,last_sen7,next_sen7,target_sen7 = read_poems(PATH7)
 
+    poems = poems5 + poems7
     words,word2id_map = gen_dict(poems)
-    last_sen_id = word2id(last_sen,words,word2id_map)
-    next_sen_id = word2id(next_sen,words,word2id_map)
-    target_sen_id = word2id(target_sen,words,word2id_map)
-    data_len = len(last_sen_id)
-    print('共有%d个序对'%(data_len))
-    last_id = np.zeros([data_len, 7], dtype=np.int32)
-    next_id = np.zeros([data_len, 7], dtype=np.int32)
-    target_id = np.zeros([data_len, 7], dtype=np.int32)
 
-    for i in range(data_len):
-        last_id[i] = np.array(last_sen_id[i])
-        next_id[i] = np.array(next_sen_id[i])
-        target_id[i] = np.array(target_sen_id[i])
+    last_sen_id5 = word2id(last_sen5,words,word2id_map)
+    next_sen_id5 = word2id(next_sen5,words,word2id_map)
+    target_sen_id5 = word2id(target_sen5,words,word2id_map)
 
-    np.save('last_id.npy',last_id)
-    np.save('next_id.npy',next_id)
-    np.save('target_id.npy',target_id)
+    last_sen_id7 = word2id(last_sen7,words,word2id_map)
+    next_sen_id7 = word2id(next_sen7,words,word2id_map)
+    target_sen_id7 = word2id(target_sen7,words,word2id_map)
+
+    data_len5 = len(last_sen_id5)
+    print('五言绝句共有%d个序对'%(data_len5))
+
+    data_len7 = len(last_sen_id7)
+    print('七言绝句共有%d个序对'%(data_len7))
+
+    last_id5 = np.zeros([data_len5, 7], dtype=np.int32)
+    next_id5 = np.zeros([data_len5, 7], dtype=np.int32)
+    target_id5 = np.zeros([data_len5, 7], dtype=np.int32)
+
+    last_id7 = np.zeros([data_len7, 9], dtype=np.int32)
+    next_id7 = np.zeros([data_len7, 9], dtype=np.int32)
+    target_id7 = np.zeros([data_len7, 9], dtype=np.int32)
+
+    for i in range(data_len5):
+        last_id5[i] = np.array(last_sen_id5[i])
+        next_id5[i] = np.array(next_sen_id5[i])
+        target_id5[i] = np.array(target_sen_id5[i])
+
+    for i in range(data_len7):
+        last_id7[i] = np.array(last_sen_id7[i])
+        next_id7[i] = np.array(next_sen_id7[i])
+        target_id7[i] = np.array(target_sen_id7[i])
+
+    np.save('last_id5.npy',last_id5)
+    np.save('next_id5.npy',next_id5)
+    np.save('target_id5.npy',target_id5)
+
+    np.save('last_id7.npy',last_id7)
+    np.save('next_id7.npy',next_id7)
+    np.save('target_id7.npy',target_id7)
     
 if __name__ == '__main__':
     preprocess_data()
-    
