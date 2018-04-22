@@ -69,6 +69,7 @@ def genNextSentence(sentence,word_num):
             feed_previous=True,
         )
     logits = tf.stack(results, axis=1)
+    print(logits)
     pred = tf.argmax(logits, axis=2)
     poem_result = []
     saver = tf.train.Saver()
@@ -79,7 +80,7 @@ def genNextSentence(sentence,word_num):
         poem_result.append(lastSentence[0:word_num])
         for i in range(3):
             encoder_input = word2id(lastSentence)
-            encoder_input = np.asarray([np.asarray(encoder_input)])
+            encoder_input = [np.asarray(encoder_input)]
             decoder_input = np.zeros([1, sequence_length])
             pred_value = sess.run(pred, feed_dict={encoder_inputs: encoder_input, decoder_inputs: decoder_input})
             sentence = id2word(pred_value[0])

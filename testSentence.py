@@ -24,9 +24,9 @@ def read_word2id_map():
         word2id_map = pickle.load(f)
     return word2id_map
 
-def getKeyword():
+def getKeyword(row, col):
     category, topics, keywords = getCategory_Topics_Keywords()
-    return random_keywords(keywords[0][0])#这里是模拟，后期要更改
+    return random_keywords(keywords[row][col])#这里是模拟，后期要更改
 
 def to_word(weights):
     t = np.cumsum(weights)#当前元素是前面所有元素的累加
@@ -81,7 +81,7 @@ def neural_network(model='lstm', rnn_size=128, num_layers=2):
     return logits, last_state, probs, cell, initial_state
 
 # 使用训练完成的模型
-def gen_firstSentence(word_num):
+def gen_firstSentence(word_num,row,col):
     if word_num == 7:
         restore_path = RESTORE_PATH7
     else:
@@ -116,7 +116,7 @@ def gen_firstSentence(word_num):
         [probs_, state_] = sess.run([probs, last_state], feed_dict={input_data: x, initial_state: state_})
         word = to_word(probs_)
         #word = words[np.argmax(probs_)]
-        poem = getKeyword()
+        poem = getKeyword(row, col)
         for word in poem:
             x = np.zeros((1,1))#生成一行一列零矩阵
             x[0,0] = word2id_map.get(word,len(words)-1)
@@ -132,6 +132,6 @@ def gen_firstSentence(word_num):
         return poem
 
 if __name__ == '__main__':
-    print(gen_firstSentence(5))
-    print(gen_firstSentence(7))
+    print(gen_firstSentence(5, 0, 0))
+    print(gen_firstSentence(7, 0, 0))
 

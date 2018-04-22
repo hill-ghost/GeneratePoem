@@ -6,8 +6,8 @@ import sys
 
 non_bmp_map = dict.fromkeys(range(0x10000, sys.maxunicode + 1), 0xfffd)
 
-path_shiXueHanYing = r'C:\Users\Pan\Desktop\poem\shixuehanying.txt'
-path_pingShuiYun = r'C:\Users\Pan\Desktop\poem\pingshuiyun.txt'
+path_shiXueHanYing = r'.\shixuehanying.txt'
+path_pingShuiYun = r'.\pingshuiyun.txt'
 
 PAT_CONTEXT = [
             [[2,0,0,1,1],[2,1,1,0,0],[2,1,0,0,1],[0,0,1,1,0]],
@@ -111,6 +111,36 @@ def pattern_match(poem_pattern):
                     break
     return -1
 
+#获取平仄模式匹配的分数
+def pattern_match_score(poem_pattern):
+    result = 0
+    if len(poem_pattern[0]) == 5:
+        for i in range(0,4):
+            temp = 0
+            for j in range(0,4):
+                for k in range(0,5):
+                    if poem_pattern[j][k] == 2 or PAT_CONTEXT[i][j][k] == 2 or poem_pattern[j][k] == PAT_CONTEXT[i][j][k]:
+                        temp = temp + 1
+                    else:
+                        temp = temp - 1
+            temp = temp / 20
+            if temp > result:
+                result = temp
+    else:
+        for i in range(4,8):
+            temp = 0
+            for j in range(0,4):
+                for k in range(0,7):
+                    if poem_pattern[j][k] == 2 or PAT_CONTEXT[i][j][k] == 2 or poem_pattern[j][k] == PAT_CONTEXT[i][j][k]:
+                        temp = temp + 1
+                    else:
+                        temp = temp - 1
+            temp = temp / 28
+            if temp > result:
+                result = temp
+    return result
+    
+
 # 获取一首诗的平仄模式，以数字表示0平1仄2通-1无
 def get_tone(title,context,poem):
     poem_pattern = []
@@ -122,7 +152,7 @@ def get_tone(title,context,poem):
             time = 0
             for k in range(0,106):
                 if poem[i][j] in context[k]:
-                    if '平' in title[k] or '上' in title[k]:
+                    if '平' in title[k]:
                         pass
                     else:
                         sum = sum + 1
@@ -157,6 +187,17 @@ def change_chinese(pattern):
         result = result + ' '
     return result
 
+def str2list(poem):
+    poem = poem.strip(u'\n')
+    sentence_list = re.split('[，。？！]',poem)[:-1]
+    result = []
+    for sentence in sentence_list:
+        temp = []
+        for word in sentence:
+            temp.append(word)
+        result.append(temp)
+    return result
+
 if __name__ == '__main__':
     # getCategory_Topics_Keywords()
     # read_pingShuiYun()
@@ -170,3 +211,5 @@ if __name__ == '__main__':
     print(get_rhythm(title,context,test3))
     print(pattern_match(PAT_CONTEXT[1]))
     print(pattern_match(get_tone(title,context,test3)))
+    test4 = '白日依山尽，黄河入海流。欲穷千里目，更上一层楼。'
+    print(pattern_match(get_tone(title,context,str2list(test4))))
